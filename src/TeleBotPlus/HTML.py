@@ -1,6 +1,7 @@
 import html
+import random
 from .utils import id_bot2client
-from typing import Union
+from typing import *
 __all__ = [
     "bold",
     "code",
@@ -19,24 +20,44 @@ __all__ = [
     "user",
     "userlink",
 ]
+EXAMPLE_SIMPLE = {
+    "type": "simple",
+    "text": [
+        "Hello ",
+        {
+            "formats": {
+                "bold": None,
+                "user": "%(id)s"
+            },
+            "text": "%(name)s"
+        }
+    ]
+}
+EXAMPLE_RANDOM = {
+    "type": "random",
+    "texts": [
+        EXAMPLE_SIMPLE["text"],
+        "Hi"
+    ]
+}
 
 
 def normal(text: str, escape: bool = True):
-  """\u041d\u0435 \u0438\u0437\u043c\u0435\u043d\u044f\u0435\u0442 \u0442\u0435\u043a\u0441\u0442"""
+  """Не изменяет текст"""
   if escape:
     text = html.escape(text)
   return text
 
 
 def bold(text: str, escape: bool = True):
-  """\u0416\u0438\u0440\u043d\u044b\u0439"""
+  """Жирный"""
   if escape:
     text = html.escape(text)
   return "<b>{}</b>".format(text)
 
 
 def code(text: str, lang: str = "", escape: bool = True):
-  """\u0411\u043b\u043e\u043a \u043a\u043e\u0434\u0430"""
+  """Блок кода"""
   if escape == True:
     escape = (True, True)
   elif escape == False:
@@ -51,14 +72,14 @@ def code(text: str, lang: str = "", escape: bool = True):
 
 
 def italic(text: str, escape: bool = True):
-  """\u041a\u0443\u0440\u0441\u0438\u0432"""
+  """Курсив"""
   if escape:
     text = html.escape(text)
   return "<i>{}</i>".format(text)
 
 
 def link(text: str, url: str, escape: bool = True):
-  """\u0421\u0441\u044b\u043b\u043a\u0430 \u0432 \u0442\u0435\u043a\u0441\u0442\u0435"""
+  """Ссылка в тексте"""
   if escape == True:
     escape = (True, True)
   elif escape == False:
@@ -76,21 +97,21 @@ url = link
 
 
 def mono(text: str, escape: bool = True):
-  """\u041c\u043e\u043d\u043e\u0448\u0438\u0440\u0438\u043d\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"""
+  """Моноширинный текст"""
   if escape:
     text = html.escape(text)
   return "<code>{}</code>".format(text)
 
 
 def quote(text: str, escape: bool = True):
-  """\u0426\u0438\u0442\u0430\u0442\u0430"""
+  """Цитата"""
   if escape:
     text = html.escape(text)
   return "<blockquote>{}</blockquote>".format(text)
 
 
 def spoiler(text: str, escape: bool = True):
-  """\u0421\u043a\u0440\u044b\u0442\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"""
+  """Скрытый текст"""
   if escape:
     text = html.escape(text)
   return "<tg-spoiler>{}</tg-spoiler>".format(text)
@@ -100,57 +121,62 @@ hide = spoiler
 
 
 def strike(text: str, escape: bool = True):
-  """\u0417\u0430\u0447\u0451\u0440\u043a\u043d\u0443\u0442\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"""
+  """Зачёркнутый текст"""
   if escape:
     text = html.escape(text)
   return "<s>{}</s>".format(text)
 
 
 def underline(text: str, escape: bool = True):
-  """\u041f\u043e\u0434\u0447\u0451\u0440\u043a\u043d\u0443\u0442\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"""
+  """Подчёркнутый текст"""
   if escape:
     text = html.escape(text)
   return "<u>{}</u>".format(text)
 
 
-def user(text: str, id: int, *args, **kw):
-  """\u0423\u043f\u043e\u043c\u0438\u043d\u0430\u043d\u0438\u0435 \u0432 \u0442\u0435\u043a\u0441\u0442\u0435 \u043f\u043e ID"""
-  id = id_bot2client(id)
+def user(text: str, id: int, convert_id: bool = False, *args, **kw):
+  """Упоминание в тексте по ID"""
+  if convert_id:
+    id = id_bot2client(id)
   return link(text, f"tg://user?id={id}", *args, **kw)
 
 
 text_mention = user
 
 
-def userlink(text: str, id: int, *args, **kw):
-  """\u0421\u0441\u044b\u043b\u043a\u0430 \u043d\u0430 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0432 \u0442\u0435\u043a\u0441\u0442\u0435 (\u0431\u0435\u0437 \u0443\u043f\u043e\u043c\u0438\u043d\u0430\u043d\u0438\u044f)"""
-  id = id_bot2client(id)
+def userlink(text: str, id: int, convert_id: bool = False, *args, **kw):
+  """Ссылка на пользователя в тексте (без упоминания)"""
+  if convert_id:
+    id = id_bot2client(id)
   return link(text, f"tg://openmessage?user_id={id}", *args, **kw)
 
 
-__dict__ = locals()
+_functions = {}
+for k, v in locals().items():
+  if k in __all__:
+    _functions[k] = v
 
 
-def from_list(l: Union[str, tuple, list]):
-  """\u041f\u0440\u0435\u043e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u0441\u043f\u0438\u0441\u043a\u0430 \u043e\u0431\u044a\u0435\u043a\u0442\u043e\u0432 \u0432 \u043e\u0442\u0444\u043e\u0440\u043c\u0430\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"""
+def _build_text(l: Union[str, list]) -> str:
   if type(l) == str:
-    return normal(l)
-  text = ""
+    return html.escape(l)
+  t = ""
   for i in l:
     if type(i) == str:
-      text += normal(i)
+      t += html.escape(i)
       continue
-    if not "type" in i:
-      i["type"] = "normal"
-    if not "text" in i:
-      i["text"] = ""
-    if not "args" in i:
-      i["args"] = ()
-    if not "kwargs" in i:
-      i["kwargs"] = {}
-    if i["type"] in __all__:
-      if type(i["text"]) == str:
-        text += __dict__[i["type"]](i["text"], *i["args"], **i["kwargs"])
-      else:
-        text += __dict__[i["type"]](from_list(i["text"]), *i["args"], **i["kwargs"])
-  return text
+    if type(i) == dict:
+      for k, v in i["formats"].items():
+        if v == None:
+          t += _functions[k](i["text"])
+        else:
+          t += _functions[k](i["text"], v)
+  return t
+
+
+def from_dict(d: dict[str, Any]) -> str:
+  if d["type"] == "simple":
+    return _build_text(d["text"])
+  if d["type"] == "random":
+    return _build_text(random.choice(d["texts"]))
+  raise ValueError("Unknown type: %s" % d["type"])

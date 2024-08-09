@@ -118,9 +118,9 @@ class Assets:
     kw["url"] = url
     return self.copy2dir(**kw)
 
-  def url2dir(self, url: str, file_id: str, file_type: str = None, *, bot: Union[str, int, telebot.TeleBot] = None, replace: bool = True, save_url: bool = True):
+  def url2dir(self, url: str, file_id: str, file_type: str = None, *, bot: Union[str, int, telebot.TeleBot] = None, replace: bool = True, save_url: bool = True, **kw):
     path = self.dir + "/.download_tmp/" + url.encode("utf-8").hex()
-    download_file(url, path)
+    download_file(url, path, **kw)
     kw = {}
     kw["bot"] = bot
     kw["file_id"] = file_id
