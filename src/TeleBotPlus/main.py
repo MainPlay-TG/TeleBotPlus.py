@@ -28,7 +28,7 @@ SHORT_NAMES = {
 
 
 class Action:
-  def __init__(self, func: Callable, args: Iterable = (), kwargs: dict[str, Any] = {}, is_async: bool = False, *, after: Iterable[Callable[[Self]]] = [], before: Iterable[Callable[[Self]]] = [], onetime: bool = False):
+  def __init__(self, func, args: Iterable = (), kwargs: dict[str, Any] = {}, is_async: bool = False, *, after: Iterable = [], before: Iterable = [], onetime: bool = False):
     self.after = after
     self.args = args
     self.before = before

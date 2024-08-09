@@ -152,7 +152,7 @@ def userlink(text: str, id: int, convert_id: bool = False, *args, **kw):
 
 
 _functions = {}
-for k, v in locals().items():
+for k, v in tuple(locals().items()):
   if k in __all__:
     _functions[k] = v
 
