@@ -176,6 +176,7 @@ class TeleBotPlus(telebot.TeleBot):
       if i in args:
         kw[i] = args[i]
     kw["self"] = self
+    exec("self.__getattr__=self._getattr")  # Чтобы VSCode не задерживалось на __getattr__
     for i in dir(telebot.TeleBot):
       if hasattr(getattr(telebot.TeleBot, i), "__doc__"):
         setattr(self, i, getattr(telebot.TeleBot, i).__doc__)
@@ -193,7 +194,7 @@ class TeleBotPlus(telebot.TeleBot):
         for i in v:
           setattr(self, i, getattr(self, k))  # Сокращение названий функций
 
-  def __getattr__(self, k: str):
+  def _getattr(self, k: str):
     """Если функция отсутствует, будет использована из оригинального бота"""
     if k in self.__dict__:
       return self.__dict__[k]
