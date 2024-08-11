@@ -12,7 +12,7 @@ class Lang:
 
   def reload_categories(self):
     def get_wrapper(cat: str):
-      def wrapper(self, name: str, values: Union[Iterable, dict[str, Any]]) -> str:
+      def wrapper(name: str, values: Union[Iterable, dict[str, Any]] = {}) -> str:
         return self.get(cat, name, values)
       return wrapper
     for category in self.data:
@@ -39,9 +39,14 @@ class Lang:
     for category in self.data:
       if not category.startswith("_"):
         for name in self.data[category]:
-          self.cache[category, name] = HTML.from_dict(self.data[category][name])
+          text, allow_cache = HTML.from_dict(self.data[category][name])
+          if allow_cache:
+            self.cache[category, name] = text
 
-  def get(self, category: str, name: str, values: Union[Iterable, dict[str, Any]]) -> str:
+  def get(self, category: str, name: str, values: Union[Iterable, dict[str, Any]] = {}) -> str:
     if not (category, name) in self.cache:
-      self.cache[category, name] = HTML.from_dict(self.data[category][name])
+      text, allow_cache = HTML.from_dict(self.data[category][name])
+      if allow_cache:
+        self.cache[category, name] = text
+      return text % values
     return self.cache[category, name] % values

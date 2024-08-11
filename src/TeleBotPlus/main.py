@@ -71,10 +71,6 @@ class Reply2Message:
   def __init__(self, bot, msg: types.Message):
     self.bot: TeleBotPlus = bot
     self.msg = msg
-    for i in dir(telebot.TeleBot):
-      if hasattr(self, i):
-        if hasattr(getattr(telebot.TeleBot, i), "__doc__"):
-          setattr(self, i, getattr(telebot.TeleBot, i).__doc__)
     for k, v in SHORT_NAMES.items():
       if hasattr(self, k):
         for i in v:
@@ -114,6 +110,7 @@ class Reply2Message:
     for i in ["chat_id", "message_thread_id", "reply_parameters"]:
       if i in kw:
         kw.pop(i)
+    kw["chat_id"] = self.msg
     kw["reply_to_message_id"] = self.msg
     return getattr(self.bot, name)(**kw)
 
@@ -177,9 +174,6 @@ class TeleBotPlus(telebot.TeleBot):
         kw[i] = args[i]
     kw["self"] = self
     exec("self.__getattr__=self._getattr")  # Чтобы VSCode не задерживалось на __getattr__
-    for i in dir(telebot.TeleBot):
-      if hasattr(getattr(telebot.TeleBot, i), "__doc__"):
-        setattr(self, i, getattr(telebot.TeleBot, i).__doc__)
     # self.MAX_CHATMESSAGES_PER_MINUTE = 20  # Максимум сообщений в минуту на чат
     # self.MAX_REQUESTS_PER_SECOND = 30  # Максимум запросов в секунду
     self.stats: dict[str, int] = {}  # Статистика использования изменённых функций

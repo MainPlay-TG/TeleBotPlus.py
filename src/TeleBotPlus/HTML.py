@@ -25,7 +25,7 @@ EXAMPLE_SIMPLE = {
     "text": [
         "Hello ",
         {
-            "formats": {
+            "styles": {
                 "bold": None,
                 "user": "%(id)s"
             },
@@ -36,7 +36,7 @@ EXAMPLE_SIMPLE = {
 EXAMPLE_RANDOM = {
     "type": "random",
     "texts": [
-        EXAMPLE_SIMPLE["text"],
+        EXAMPLE_SIMPLE,
         "Hi"
     ]
 }
@@ -159,24 +159,33 @@ for k, v in tuple(locals().items()):
 
 def _build_text(l: Union[str, list]) -> str:
   if type(l) == str:
-    return html.escape(l)
+    return normal(l)
   t = ""
   for i in l:
     if type(i) == str:
-      t += html.escape(i)
+      t += normal(i)
       continue
     if type(i) == dict:
-      for k, v in i["formats"].items():
-        if v == None:
-          t += _functions[k](i["text"])
-        else:
-          t += _functions[k](i["text"], v)
+      s = normal(i["text"])
+      if "styles" in i:
+        for k, v in i["styles"].items():
+          if v == None:
+            s = _functions[k](s, escape=False)
+          else:
+            s = _functions[k](s, v, escape=False)
+      t += s
   return t
 
 
-def from_dict(d: dict[str, Any]) -> str:
+def from_dict(d: dict[str, Any]) -> tuple[str, bool]:
+  """text,allow_cache"""
+  if type(d) == str:
+    return normal(d), True
+  if not "type" in d:
+    d["type"] = "simple"
+  d["type"] = d["type"].lower()
   if d["type"] == "simple":
-    return _build_text(d["text"])
+    return _build_text(d["text"]), True
   if d["type"] == "random":
-    return _build_text(random.choice(d["texts"]))
+    return from_dict(random.choice(d["texts"]))[0], False
   raise ValueError("Unknown type: %s" % d["type"])
