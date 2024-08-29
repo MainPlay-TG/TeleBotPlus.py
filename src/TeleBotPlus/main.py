@@ -178,7 +178,7 @@ class TeleBotPlus(telebot.TeleBot):
     # self.MAX_REQUESTS_PER_SECOND = 30  # Максимум запросов в секунду
     self.stats: dict[str, int] = {}  # Статистика использования изменённых функций
     telebot.TeleBot.__init__(**kw)  # Создание оригинального бота
-    self.assets = Assets(bot=self)  # Загрузка ассетов
+    self._assets = None
     # self.queue = Queue()  # Очередь
     # self.queue_thread = Thread(target=self._queue_sender, daemon=False)
     # self.queue_thread.start()  # Запуск обработчика очереди
@@ -187,6 +187,12 @@ class TeleBotPlus(telebot.TeleBot):
       if hasattr(self, k):
         for i in v:
           setattr(self, i, getattr(self, k))  # Сокращение названий функций
+
+  @property
+  def assets(self) -> Assets:
+    if self._assets is None:
+      self._assets = Assets(bot=self)
+    return self._assets
 
   def _getattr(self, k: str):
     """Если функция отсутствует, будет использована из оригинального бота"""
@@ -267,10 +273,7 @@ class TeleBotPlus(telebot.TeleBot):
       if type(kw["chat_id"]) == types.Message:
         msg = kw["chat_id"]
         kw["chat_id"] = msg.chat.id
-        kw["message_thread_id"] = msg.message_thread_id
-      if type(kw["chat_id"]) == types.ForumTopic:
-        topic = kw["chat_id"]
-        kw["message_thread_id"] = topic.message_thread_id
+        # kw["message_thread_id"] = msg.message_thread_id
     if kw.get("timeout") != None:
       if type(kw["timeout"]) == timedelta:
         kw["timeout"] = kw["timeout"].total_seconds()
