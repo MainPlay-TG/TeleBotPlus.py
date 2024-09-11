@@ -1,4 +1,4 @@
-import MainShortcuts as ms
+from MainShortcuts2 import ms
 
 
 def id_bot2client(id: int):

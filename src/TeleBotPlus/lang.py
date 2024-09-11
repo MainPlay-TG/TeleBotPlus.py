@@ -1,6 +1,6 @@
 import os
-import MainShortcuts as ms
 from . import HTML
+from MainShortcuts2 import ms
 from typing import *
 
 
@@ -43,10 +43,27 @@ class Lang:
           if allow_cache:
             self.cache[category, name] = text
 
-  def get(self, category: str, name: str, values: Union[Iterable, dict[str, Any]] = {}) -> str:
+  def get(self, category: str, name: str, values: Union[str, list, tuple, dict[str, Any]] = {}) -> str:
+    v = values
+    if type(values) in [list, tuple]:
+      v = []
+      for i in values:
+        if type(i) == str:
+          v.append(HTML.normal(i))
+        else:
+          v.append(i)
+    if type(values) == dict:
+      v = {}
+      for i, obj in values.items():
+        if type(obj) == str:
+          v[i] = HTML.normal(obj)
+        else:
+          v[i] = obj
+    if type(values) == str:
+      v = HTML.normal(values)
     if not (category, name) in self.cache:
       text, allow_cache = HTML.from_dict(self.data[category][name])
       if allow_cache:
         self.cache[category, name] = text
-      return text % values
-    return self.cache[category, name] % values
+      return text % v
+    return self.cache[category, name] % v

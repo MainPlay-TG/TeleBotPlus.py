@@ -103,11 +103,14 @@ def mono(text: str, escape: bool = True):
   return "<code>{}</code>".format(text)
 
 
-def quote(text: str, escape: bool = True):
+def quote(text: str, expandable: bool = False, escape: bool = True):
   """Цитата"""
   if escape:
     text = html.escape(text)
-  return "<blockquote>{}</blockquote>".format(text)
+  if expandable:
+    return "<blockquote expandable>{}</blockquote>".format(text)
+  else:
+    return "<blockquote>{}</blockquote>".format(text)
 
 
 def spoiler(text: str, escape: bool = True):

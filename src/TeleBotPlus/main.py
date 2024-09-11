@@ -1,9 +1,9 @@
 import inspect
 import telebot
-import MainShortcuts as ms
 from .assets import Assets
 from datetime import timedelta
 from functools import wraps
+from MainShortcuts2 import ms
 from telebot import types
 from typing import *
 args_names: dict[str, tuple] = {}

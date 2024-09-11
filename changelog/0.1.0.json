@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "version_id": 10,
+  "fixed": [
+    "Класс `.assets.Assets` создаёт папки только при необходимости",
+    "HTML Escape в `.lang.Lang.get`"
+  ],
+  "added": [
+    "Аргумент `expandable` для функции `.HTML.quote`",
+    "Подмодуль `.webhook`"
+  ],
+  "changed": [],
+  "removed": []
+}

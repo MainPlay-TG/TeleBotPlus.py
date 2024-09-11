@@ -1,9 +1,9 @@
 import os
 import telebot
-import MainShortcuts as ms
 from . import assets_converter
 from .utils import download_file
 from hashlib import sha512
+from MainShortcuts2 import ms
 from typing import Union
 
 
@@ -16,10 +16,7 @@ class Assets:
     self.add_bot(bot)
     self.main_bot = bot.token
     self.dir = os.path.abspath(dir).replace("\\", "/")
-    ms.dir.create(self.dir + "/objects")
-    ms.dir.create(self.dir + "/.download_tmp")
-    for i in os.listdir(self.dir + "/.download_tmp"):
-      ms.path.rm(self.dir + "/.download_tmp/" + i)
+    ms.path.rm(self.dir + "/.download_tmp")
     if auto_load:
       if os.path.isfile(f"{self.dir}/index.json"):
         self.index = ms.json.read(f"{self.dir}/index.json")
@@ -88,6 +85,7 @@ class Assets:
           print(f'WARN: Failed to check "file_id" for the file "{hash_hex}": {error}')
     if ms.path.exists(f"{self.dir}/objects/{hash_hex}") and replace:
       ms.path.rm(f"{self.dir}/objects/{hash_hex}")
+    ms.dir.create(f"{self.dir}/objects")
     if move:
       ms.file.move(path, f"{self.dir}/objects/{hash_hex}")
     else:
@@ -120,7 +118,10 @@ class Assets:
 
   def url2dir(self, url: str, file_id: str, file_type: str = None, *, bot: Union[str, int, telebot.TeleBot] = None, replace: bool = True, save_url: bool = True, **kw):
     path = self.dir + "/.download_tmp/" + url.encode("utf-8").hex()
-    download_file(url, path, **kw)
+    kw["path"] = path
+    kw["url"] = url
+    ms.dir.create(self.dir + "/.download_tmp")
+    download_file(**kw)
     kw = {}
     kw["bot"] = bot
     kw["file_id"] = file_id
@@ -134,6 +135,7 @@ class Assets:
   def file_id2dir(self, file_id: str, file_type: str = None, *, bot: Union[str, int, telebot.TeleBot] = None, replace: bool = True):
     bot = self.get_bot(bot)
     path = self.dir + "/.download_tmp/" + (str(bot["id"]) + file_id).encode("utf-8").hex()
+    ms.dir.create(self.dir + "/.download_tmp")
     download_file(bot["bot"].get_file_url(file_id), path)
     return self.move2dir(path, file_id, file_type, bot=bot, replace=replace)
 
@@ -144,6 +146,8 @@ class Assets:
 
   def load(self, **kw):
     kw["path"] = f"{self.dir}/index.json"
+    if not "like_json5" in kw:
+      kw["like_json5"] = False
     self.index = ms.json.read(**kw)
     for k, v in self.index["objects"].items():
       v["id"] = k
