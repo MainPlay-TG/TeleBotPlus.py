@@ -1,0 +1,10 @@
+{
+  "version": "0.1.1",
+  "version_id": 11,
+  "fixed": [
+    "Запуск вебхука на `aiohttp`"
+  ],
+  "added": [],
+  "changed": [],
+  "removed": []
+}

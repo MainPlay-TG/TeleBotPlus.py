@@ -62,9 +62,11 @@ class WebhookListener:
     return self._running
 
   def start(self, timeout: Union[None, float] = None):
-    """Запустить прослушивание вебхука"""
+    """Запустить прослушивание вебхука. `timeout` не работает для `aiohttp`"""
     if self.running:
       return
+    if self.app_name == "aiohttp":
+      return self._start()
     t = Thread(daemon=False, target=self._start)
     t.start()
     self._running = True
