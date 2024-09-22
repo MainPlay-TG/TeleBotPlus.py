@@ -3,11 +3,11 @@
 https://t.me/MainPlayCh"""
 
 __scripts__ = []
-__all__ = ["Assets", "HTML", "Lang", "TeleBotPlus", "utils"]
+__all__ = ["Assets", "HTML", "Lang", "MultiLang", "TeleBotPlus", "utils"]
 from . import HTML
 from . import utils
 from ._module_info import version as __version__
 from .assets import Assets
-from .lang import Lang
+from .lang import Lang, MultiLang
 from .main import TeleBotPlus
 __all__.sort()
