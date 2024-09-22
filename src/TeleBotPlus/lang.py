@@ -180,6 +180,8 @@ class MultiLang(_MultiLang_base):
     self.log: Union[None, Logger] = logger
     self.main_lang_path: Path = Path(main_lang)
     self.other_langs_path: dict[str, Path] = {}
+    self.prefix: str = None
+    self.suffix: str = None
     for k, v in other_langs.items():
       self.other_langs_path[k] = Path(v)
     self.load()
@@ -261,7 +263,7 @@ class MultiLang(_MultiLang_base):
       else:
         path = self.other_langs_path[i].path
       try:
-        self.langs[i] = ms.json.load(path)["texts"]
+        self.langs[i] = ms.json.read(path)["texts"]
       except Exception as err:
         if not self.log is None:
           self.log.exception("Error when loading language %r from file %r", i, path)
@@ -273,6 +275,7 @@ class MultiLang(_MultiLang_base):
     if langs is None:
       langs = [None] + list(self.other_langs_path.keys())
     kw["data"] = {}
+    kw["data"]["format"] = "TeleBotPlus.MultiLang"
     for i in langs:
       if i is None:
         path = self.main_lang_path.path
@@ -302,10 +305,11 @@ class MultiLang(_MultiLang_base):
 
   def get(self, cat: str, name: str, values: Union[dict, list, str, tuple] = None, *, add_prefix: bool = None, add_suffix: bool = None, lang: Union[None, str] = None) -> str:
     """Получить готовый HTML текст"""
-    if add_prefix and self.prefix:
-      result = self.prefix
+    result = ""
+    if (True if add_prefix is None else bool(add_prefix)) and self.prefix:
+      result += self.prefix
     result += self._get(cat=cat, lang=lang, name=name, values=values)
-    if add_suffix and self.suffix:
+    if (True if add_suffix is None else bool(add_suffix)) and self.suffix:
       result += self.suffix
     return result
 
