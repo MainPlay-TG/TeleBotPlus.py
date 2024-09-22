@@ -1,4 +1,3 @@
-"""/bot/lib/webhooks.py"""
 import atexit
 import ssl
 from . import TeleBotPlus
