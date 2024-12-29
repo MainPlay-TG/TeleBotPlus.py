@@ -56,7 +56,7 @@ def bold(text: str, escape: bool = True):
   return "<b>{}</b>".format(text)
 
 
-def code(text: str, lang: str = "", escape: bool = True):
+def code(text: str, lang: str =None, escape: bool = True):
   """Блок кода"""
   if escape == True:
     escape = (True, True)
@@ -66,9 +66,7 @@ def code(text: str, lang: str = "", escape: bool = True):
     escape = (escape["text"], escape["lang"])
   if escape[0]:
     text = html.escape(text)
-  if escape[1]:
-    lang = html.escape(lang)
-  return '<pre><code class="{}">{}</code></pre>'.format(lang.lower(), text)
+  return '<pre>{}</pre>'.format(text)
 
 
 def italic(text: str, escape: bool = True):
